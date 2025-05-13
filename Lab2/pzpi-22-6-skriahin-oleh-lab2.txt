@@ -1,1 +1,378 @@
+МІНІСТЕРСТВО ОСВІТИ ТА НАУКИ УКРАЇНИ
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+
+
+
+Кафедра програмної інженерії
+
+
+ЗВІТ
+З дисципліни «Архітектура програмного забезпечення»
+З лабораторної роботи №2
+На тему: «Серверна частина програмної системи»
+
+
+Виконав:								        Перевірив:
+ст. гр. ПЗПІ-22-6 							доц. Сокорчук І.П.
+Скрягін О.С.
+
+
+
+
+Харків 2025 
+1 ІСТОРІЯ ЗМІН
+Таблиця 1.1 – Історія змін 
+№	Дата	Версія звіту	Опис змін та виправлень 
+1	12.05.2025	0.1	Створено розділ “Історія змін”
+2	11.05.2025	0.1	Створено розділ “Завдання”
+3	12.05.2025	0.1	Створено розділ “Опис виконаної роботи”
+4	12.05.2025	0.1	Створено розділ “Висновки”
+5	12.05.2025	0.1	Додано посилання на відеозапис доповіді та текст хронологічного опису у Додаток А
+6	12.05.2025	0.1	Додано UML діаграми у Додаток Б
+7	11.05.2025	0.1	Додано код у Додаток В
+
+ 
+2 ЗАВДАННЯ
+1.	Описати програмну архітектуру програмної системи та архітектуру її серверної частини.
+2.	Описати математичні методи обробки користувацьких даних для реалізації бізнес-логіки програмної системи.
+3.	Описати математичні методи обробки користувацьких даних у серверній частині програмної системи.
+4.	Описати ER-модель даних програмної системи та структуру бази даних.
+5.	Описати специфікацію REST методу взаємодії програмних компонент програмної системи.
+6.	Описати використані у серверній частині програмної системи програмні технології та компоненти.
+7.	Описати способи інтернаціоналізації у серверній частині програмної системи.
+8.	Описати програмну реалізацію серверної частини програмної системи.
+ 
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+Серверна частина системи розроблена з використанням Django Rest Framework (DRF) для обробки запитів і роботи з даними. Як база даних використовується PostgreSQL. Для забезпечення безпеки взаємодії між клієнтами і сервером застосовується аутентифікація на основі JWT (JSON Web Tokens). Комунікація з клієнтами реалізована через API, яке забезпечує інтеграцію з мобільними додатками та IoT-сенсорами. Серверна частина зберігає відео з камер, дані з датчиків та генерує звіти по інцидентах.
+У серверній частині програмної системи реалізовано кілька математичних методів обробки користувацьких даних для забезпечення коректної та ефективної роботи бізнес-логіки. Зокрема, застосовуються такі підходи:
+	Пороговий аналіз: для виявлення інцидентів типу "пожежа", "витік газу" або "вторгнення" здійснюється перевірка значень із сенсорів на перевищення критичних порогів. Наприклад, якщо температура перевищує 70°C або рівень газу перевищує задану концентрацію — створюється запис інциденту. Це реалізовано шляхом порівняння отриманих значень із фіксованими граничними межами.
+	Агрегація даних: під час створення звітів або виводу статистики застосовуються методи обчислення середніх значень показників сенсорів, підрахунок кількості інцидентів за певний період тощо. Це дозволяє отримати загальну картину стану системи без потреби переглядати кожен лог окремо.
+	Формальна валідація: вхідні дані користувача, такі як номер телефону або електронна адреса, проходять перевірку на відповідність форматам за допомогою регулярних виразів. Також перевіряється, чи не виходять числові параметри за допустимі діапазони.
+	Фільтрація та сортування: при запитах до API реалізовано можливість сортування інцидентів за датою створення, типом або місцем події, а також фільтрація за заданими параметрами. Це дозволяє гнучко обробляти великі об’єми даних.
+Інтернаціоналізація у серверній частині програмної системи реалізована з метою забезпечення підтримки кількох мов інтерфейсу для клієнтської частини, що створена за допомогою React. Серверна частина відповідає за надання мовозалежних даних, повідомлень та одиниць виміру відповідно до обраної користувачем мови.
+Основний принцип реалізації полягає у врахуванні параметра Accept-Language або lang, який надсилається у кожному запиті клієнта. На основі цього параметра сервер формує відповіді, що містять перекладені текстові поля, повідомлення, описи помилок та інші елементи, які залежать від мови.
+Для цього на сервері використовуються вбудовані засоби локалізації. Наприклад, у разі використання Django застосовується модуль django.utils.translation, який дозволяє позначати текстові рядки функціями gettext або gettext_lazy, а також створювати файли перекладу .po/.mo. Також можливо використання окремих JSON-файлів або таблиць у базі даних зі словниками перекладів, які повертаються через окремий маршрут, наприклад: /api/translations?lang=uk. Це дозволяє клієнтському додатку React динамічно завантажувати потрібні переклади під час ініціалізації.
+Модулі серверної частини:
+1.	Авторизація та аутентифікація
+	Реєстрація та вхід користувачів: Реалізовано функціонал створення облікових записів для охоронців, співробітників і адміністраторів торгового центру.
+	Використання JWT: Забезпечує безпечну аутентифікацію та авторизацію, надаючи доступ до захищених ресурсів.
+2.	Управління користувачами
+	CRUD-операції над користувачами: Адміністратори можуть додавати, редагувати, видаляти та переглядати профілі співробітників і охоронців.
+	Призначення ролей: Встановлення ролей користувачів (охоронець, співробітник, адміністратор) для керування доступом.
+3.	Управління IoT-пристроями
+	Збір даних із датчиків: Система обробляє показники датчиків руху, диму, температури, газу та вологості в реальному часі.
+	Передача даних на сервер: Інформація з сенсорів синхронізується для аналізу та реагування.
+	Контроль стану пристроїв: Включає управління станом датчиків та їх оновлення.
+4.	Обробка інцидентів
+	Реєстрація подій: Система фіксує всі інциденти, включаючи спрацювання сенсорів або повідомлення від користувачів.
+	Зв'язок інцидентів із сенсорами: Інформація про інциденти доповнюється даними із датчиків і відеозаписами.
+	Класифікація інцидентів: Визначення рівня загрози та пріоритетів для оперативного реагування.
+5.	Управління відеоспостереженням
+	Зберігання записів: Система зберігає відео з камер для подальшого аналізу.
+	Доступ до відео: Адміністратори та співробітники можуть переглядати записи, пов'язані з інцидентами.
+6.	Модуль сповіщень
+	Push-сповіщення: Інформування користувачів про критичні події, такі як пожежа або витік газу.
+	Інтеграція з аварійними службами: Надсилання автоматичних повідомлень у разі надзвичайних ситуацій.
+7.	Аналітика та звіти
+	Генерація звітів: Автоматичне створення статистики по інцидентах, активності датчиків та інших параметрах.
+	Аналіз даних: Інструменти для виявлення трендів та аномалій у роботі системи безпеки.
+8.	API для мобільних і веб-клієнтів
+	Реалізація REST API: Забезпечує доступ мобільних і веб-додатків до даних із сервера.
+
+Таблиця 1 – Таблиця "Users"
+Поле	Тип даних	Обмеження
+
+id	INT	Primary Key, Auto_Increment
+password	VARCHAR(128)	NOT NULL
+last_login	DATETIME	NULLABLE
+is_superuser	BOOLEAN	NOT NULL
+username	VARCHAR(80)	UNIQUE, NOT NULL
+first_name	VARCHAR(70)	-
+last_name	VARCHAR(70)	-
+email	VARCHAR(150)	UNIQUE
+phone_number	VARCHAR(15)	NULLABLE
+role	VARCHAR(10)	NOT NULL
+
+
+Таблиця 2 – Таблиця " Incidents"
+Поле	Тип даних	Обмеження
+
+id	INT	Primary Key, Auto_Increment
+type	VARCHAR(20)	NOT NULL
+details	TEXT	NOT NULL
+created_at	DATETIME	NOT NULL
+FDI	
+VARCHAR(50)
+
+NOT NULL
+
+location	VARCHAR(100)	NOT NULL
+
+Таблиця 3 – Таблиця " IncidentSensorLog"
+Поле	Тип даних	Обмеження
+
+id	BIGINT	Primary Key, Auto_Increment
+incident_id	BIGINT	NOT NULL, Foreign Key (IncidentReport), ON DELETE CASCADE
+sensor_log_id	BIGINT	NOT NULL, Foreign Key (SensorLog), ON DELETE CASCADE
+
+Таблиця 4 – Таблиця " Notifications"
+Поле	Тип даних	Обмеження
+
+id	INT	Primary Key, Auto_Increment
+title	VARCHAR(100)	NOT NULL
+message	TEXT	NOT NULL
+is_read	BOOLEAN	NOT NULL
+created_at	DATETIME	NOT NULL
+user_id	INT	Foreign Key (Users.id), NOT NULL
+reason	VARCHAR(255)	NOT NULL
+incident_id	INT	Foreign Key (Incidents.id), ON DELETE CASCADE
+
+
+Таблиця 5 – Таблиця " Sensors"
+Поле	Тип даних	Обмеження
+
+id	INT	Primary Key, Auto_Increment
+sensor_type_id	INT	Foreign Key (SensorType.id), ON DELETE CASCADE
+location	VARCHAR(255)	NOT NULL
+status	BOOLEAN	NOT NULL
+
+Таблиця 7 – Таблиця " SensorLogs"
+Поле	Тип даних	Обмеження
+
+Id	INT	Primary Key, Auto_Increment
+value	FLOAT	NOT NULL
+timestamp	DATETIME	NOT NULL
+exceeded_threshold	BOOLEAN	NOT NULL
+sensor_id	INT	Foreign Key (Sensors.id), ON DELETE CASCADE
+
+
+Таблиця 8 – Специфікація розробленого API.
+Метод запиту	Шлях	Пояснення
+POST	/register/	Реєстрація користувача. Повертає дані користувача та JWT токени доступу і оновлення.
+GET	/profile/	Запит інформації про профіль поточного автентифікованого користувача.
+POST	/logout/	Вихід користувача. Додає refresh-токен у чорний список
+GET	/users/	Запит списку всіх користувачів.
+GET	/users/<int:pk>/	Запит інформації про конкретного користувача.
+PUT	/users/<int:pk>/	Оновлення інформації конкретного користувача.
+DELETE	/users/<int:pk>/	Деактивація конкретного користувача.
+POST	/api/token/	Отримання пари токенів (доступу та оновлення) для автентифікації.
+POST	/api/token/refresh/	Оновлення токену доступу за допомогою refresh-токену.
+GET	/notifications/	Отримання списку всіх сповіщень для автентифікованого користувача.
+POST	/notifications/	Створення нового сповіщення для автентифікованого користувача.
+GET	/notifications/<int:pk>/	Отримання інформації про конкретне сповіщення.
+PUT	/notifications/<int:pk>/	Оновлення інформації про конкретне сповіщення.
+DELETE	/notifications/<int:pk>/	Видалення конкретного сповіщення.
+GET	/sensors/	Отримати список всіх сенсорів.
+POST	/sensors/	Створити новий сенсор.
+GET		/sensors/<int:pk>/	Отримати інформацію про конкретний сенсор з його ID.
+PUT	/sensors/<int:pk>/	Оновити інформацію про конкретний сенсор.
+DELETE	/sensors/<int:pk>/	Видалити сенсор за його ID.
+GET	/sensors/<int:sensor_id>/logs/	Отримати список логів для конкретного сенсора.
+POST	/sensors/<int:sensor_id>/logs/	Додати новий лог для сенсора.
+GET	/sensors/logs/<int:pk>/	Отримати інформацію про конкретний лог сенсора за його ID.
+PUT	/sensors/logs/<int:pk>/	Оновлення даних конкретного лога сенсора.
+DELETE	/sensors/logs/<int:pk>/	Видалити лог сенсора за його ID.
+GET	/incidents/	Отримати список усіх інцидентів.
+POST	/incidents/	Створити новий інцидент.
+GET	/incidents/<int:pk>/	Отримати деталі конкретного інциденту за його ID.
+PUT	/incidents/<int:pk>/	Оновити інформацію про конкретний інцидент.
+DELETE	/incidents/<int:pk>/	Видалити інцидент за його ID.
+
+ 
+4 ВИСНОВКИ
+Під час виконання лабораторної роботи було розроблено серверну частину програмної системи. 
+ДОДАТОК А
+Посилання на відеозапис доповіді та текст хронологічного опису доповіді
+Відеозапис доповіді на YouTube: https://youtu.be/BBJcXAGvCjw
+Хронологічний опис доповіді:
+00:00 - Вступна частина.
+00:11 - Тестування реєстрації/входу.
+01:20 - Тестування адміністрування користувачів.
+02:45 - Тестування взаємодії з сенсорами.
+03:50 - Тестування бізнес-логіки.
+05:36 - Реалізація бізнес-логіки повідомлень.
+06:35 - Адміністрування БД.
+07:38 - Створення міграцій та їх застосування.
+08:05 - Відновлення БД. 
+ДОДАТОК Б
+ 
+Рисунок Б.1 - UML діаграму розгортання
+
+
+ 
+Рисунок Б.2 – UML діаграма прецедентів
+ 
+Рисунок Б.3 – UML діаграма прецедентів для ІоТ клієнта.
+
+ 
+Рисунок Б.4 – ER діаграма даних
+
+ 
+Рисунок Б.5 – Діаграма діяльності для ІоТ клієнта.
+
+  Рисунок Б.6 – UML-діаграма діяльності для серверної частини
+ 
+ДОДАТОК В
+Програмний код
+В.1 Математична обробка прикладних даних.
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab2/pzpi-22-6-skriahin-oleh-lab2/sensors/views.py#L141.
+1    TEMP_RANGE = (20.0, 100.0)
+2    GAS_RANGE = (0.0, 300.0)
+3    HUM_RANGE = (0.0, 100.0)
+4    WEIGHTS = {
+5        'temp': 0.4,
+6        'gas': 0.3,
+7        'hum': 0.3,
+8    }
+9    
+10    
+11    def normalize(value, min_val, max_val):
+12        return max(0.0, min(1.0, (value - min_val) / (max_val - min_val)))
+13    
+14    
+15    class CreateSensorLogAPIView(APIView):
+16        """
+17        POST: Create log and trigger incident if needed
+18        """
+19        permission_classes = [AllowAny]
+20        serializer_class = CreateSensorLogSerializer
+21    
+22        def post(self, request, *args, **kwargs):
+23            serializer = self.serializer_class(data=request.data)
+24            serializer.is_valid(raise_exception=True)
+25            sensor = get_object_or_404(Sensor, pk=serializer.validated_data['sensor_id'])
+26            log = SensorLog.objects.create(sensor=sensor, value=serializer.validated_data['value'])
+27            log.check_threshold()
+28    
+29            latest_temp = SensorLog.objects.filter(
+30                sensor__sensor_type__type='temperature',
+31                sensor__location=sensor.location
+32            ).order_by('-timestamp').first()
+33            latest_humidity = SensorLog.objects.filter(
+34                sensor__sensor_type__type='humidity',
+35                sensor__location=sensor.location
+36            ).order_by('-timestamp').first()
+37            latest_gas = SensorLog.objects.filter(
+38                sensor__sensor_type__type='gas',
+39                sensor__location=sensor.location
+40            ).order_by('-timestamp').first()
+41    
+42            if latest_temp and latest_humidity and latest_gas:
+43    
+44                Tn = normalize(latest_temp.value, *TEMP_RANGE)
+45                Gn = normalize(latest_gas.value, *GAS_RANGE)
+46                Hn = normalize(latest_humidity.value, *HUM_RANGE)
+47    
+48                fdi = (
+49                    WEIGHTS['temp'] * Tn
+50                    + WEIGHTS['gas'] * Gn
+51                    + WEIGHTS['hum'] * (1 - Hn)
+52                )
+53                
+54                FDI_THRESHOLD = 0.7
+55                if fdi > FDI_THRESHOLD:
+56                    incident = IncidentReport.objects.create(
+57                        type='fire',
+58                        details=f"Temp={latest_temp.value}, Humidity={latest_humidity.value}, Gas={latest_gas.value}",
+59                        location=sensor.location,
+60                        FDI=fdi
+61                    )
+62    
+63                    unique_logs = {entry.id: entry for entry in [log, latest_temp, latest_humidity, latest_gas]}.values()
+64                    IncidentSensorLog.objects.bulk_create([
+65                        IncidentSensorLog(incident=incident, sensor_log=entry)
+66                        for entry in unique_logs
+67                    ])
+68    
+69                    admins = User.objects.filter(role='admin')
+70                    emails = list(admins.values_list('email', flat=True))
+71                    notifications = [
+72                        Notification(
+73                            user=admin,
+74                            incident=incident,
+75                            reason="Fire danger threshold exceeded",
+76                            title="Fire Danger Alert",
+77                            message=f"Fire danger in {sensor.location}. Details: {incident.details}",
+78                            is_read=False
+79                        ) for admin in admins
+80                    ]
+81                    Notification.objects.bulk_create(notifications)
+82    
+83                    if emails:
+84                        send_mail(
+85                            subject="Fire Danger Alert",
+86                            message=(
+87                                f"Fire danger detected in {sensor.location}.\n"
+88                                f"Temp: {latest_temp.value}\n"
+89                                f"Humidity: {latest_humidity.value}\n"
+90                                f"Gas: {latest_gas.value}\n"
+91                                f"FDI: {fdi:.2f}"
+92                            ),
+93                            from_email="smartshield1@zohomail.eu",
+94                            recipient_list=emails,
+95                            fail_silently=True,
+96                        )
+97                    return Response({"incident_id": incident.id, "fdi": fdi}, status=status.HTTP_201_CREATED)
+98    
+99            return Response({"message": "Log created, FDI not triggered", "fdi": None}, status=status.HTTP_201_CREATED)
+ 
+В.2 Адміністрування облікових записів користувачів.
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab2/pzpi-22-6-skriahin-oleh-lab2/adminapp/views.py#L9.
+1    class IsAdminUser(BasePermission):
+2        def has_permission(self, request, view):
+3            return request.user.is_authenticated and request.user.role == 'admin'
+4    
+5    class MakeMigrationsView(APIView):
+6        permission_classes = [IsAuthenticated, IsAdminUser]
+7    
+8        def post(self, request):
+9            try:
+10                call_command('makemigrations')
+11                return Response({"message": "Migrations created successfully."}, status=200)
+12            except Exception as e:
+13                return Response({"error": str(e)}, status=500)
+14    
+15    class MigrateView(APIView):
+16        permission_classes = [IsAuthenticated, IsAdminUser]
+17    
+18        def post(self, request):
+19            try:
+20                call_command('migrate')
+21                return Response({"message": "Migrations applied successfully."}, status=200)
+22            except Exception as e:
+23                return Response({"error": str(e)}, status=500)
+24    
+25    
+26    class BackupDatabaseView(APIView):
+27        permission_classes = [IsAuthenticated, IsAdminUser]
+28    
+29        def post(self, request):
+30            backup_file = os.path.join(settings.BASE_DIR, 'backup.sql')
+31            try:
+32                subprocess.run(
+33                    ['pg_dump', '-h', 'localhost', '-U', settings.DATABASES['default']['USER'],
+34                     '-d', settings.DATABASES['default']['NAME'], '-f', backup_file],
+35                    check=True
+36                )
+37                return Response({"message": "Backup created successfully.", "file": backup_file}, status=200)
+38            except Exception as e:
+39                return Response({"error": str(e)}, status=500)
+40    
+41    
+42    class RestoreDatabaseView(APIView):
+43        permission_classes = [IsAuthenticated, IsAdminUser]
+44    
+45        def post(self, request):
+46            backup_file =  os.path.join(settings.BASE_DIR, 'backup.sql')
+47            if not backup_file or not os.path.exists(backup_file):
+48                return Response({"error": "Backup file not found."}, status=400)
+49            try:
+50                subprocess.run(
+51                    ['psql', '-h', 'localhost', '-U', settings.DATABASES['default']['USER'],
+52                     '-d', settings.DATABASES['default']['NAME'], '-f', backup_file],
+53                    check=True
+54                )
+55                return Response({"message": "Database restored successfully."}, status=200)
+56            except Exception as e:
+57                return Response({"error": str(e)}, status=500)
 

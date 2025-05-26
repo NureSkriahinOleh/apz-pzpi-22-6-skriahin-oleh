@@ -1,0 +1,14 @@
+{
+    "title": "Room Monitoring",
+    "show_all": "Show all sensors",
+    "no_logs": "No data",
+    "possible_danger": "Possible danger!",
+    "FDI": "FDI",
+    "Sensor": "Sensor",
+    "Last": "Last",
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "gas": "CO₂",
+    "unit_C": "°C",
+    "unit_F": "°F"
+  }

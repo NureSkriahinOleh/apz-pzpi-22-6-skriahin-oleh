@@ -1,1 +1,265 @@
+МІНІСТЕРСТВО ОСВІТИ ТА НАУКИ УКРАЇНИ
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+
+
+
+Кафедра програмної інженерії
+
+
+ЗВІТ
+З дисципліни «Архітектура програмного забезпечення»
+З лабораторної роботи №3
+На тему: «Веб клієнт програмної системи»
+
+
+Виконав:								Перевірив:
+ст. гр. ПЗПІ-22-6 			доц. Сокорчук І.П.
+Скрягін О.С.
+
+
+
+
+Харків 2025 
+1 ІСТОРІЯ ЗМІН
+Таблиця 1.1 – Історія змін 
+№	Дата	Версія звіту	Опис змін та виправлень 
+1	25.05.2025	0.1	Створено розділ “Історія змін”
+2	23.05.2025	0.1	Створено розділ “Завдання”
+3	25.05.2025	0.1	Створено розділ “Опис виконаної роботи”
+4	25.05.2025	0.1	Створено розділ “Висновки”
+5	25.05.2025	0.1	Додано посилання на відеозапис доповіді та текст хронологічного опису у Додаток А
+6	24.05.2025	0.1	Додано діаграми у Додаток Б
+7	25.05.2025	0.1	Додано код у Додаток В
+
+ 
+2 ЗАВДАННЯ
+	Проаналізувати технічні вимоги до front-end частини системи.
+	Відкрити існуючий репозиторій на GitHub із результатами попередніх лабораторних.
+	Створити в корені репозиторію папку Task3 та файл із описом інженерних рішень.
+	Фіксувати всі зміни командою git commit із зрозумілими коментарями.
+	У папці Task3 створити каталог для вихідного коду React/Vite.
+	Розробити та закомітити клієнтський код (React + Vite).
+	Провести функціональне тестування, записати відео 7–10 хв. із усними поясненнями.
+	Опублікувати відео на YouTube-каналі в домені @nure.ua і підготувати хронологічний опис.
+	Підготувати PDF-звіт із коротким описом архітектури, тестуванням і посиланням на відео.
+	Завантажити PDF на платформу https://dl.nure.ua/ та в коментарях вказати посилання на відео. 
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+Програмне забезпечення клієнтської/front-end частини реалізовано на сучасному стеку Vite + React із застосуванням бібліотеки Axios для HTTP-запитів, react-i18next для інтернаціоналізації, Recharts для побудови графіків, та WebSocket (через кастомний хук) для real-time оновлень даних. Стан додатку управляється через React Context (AuthContext для авторизації з JWT-токенами та UIContext для глобальних налаштувань мови і одиниць вимірювання). Маршрутизація здійснена за допомогою react-router-dom. Бекенд-частина реалізована на Django REST Framework із механізмом перевірки JWT-токенів на кожному запиті, CRUD-ендпоінтами для сенсорів, користувачів та логів, а також спеціальними API для міграцій і бекапу бази даних.
+Вся бізнес-логіка зосереджена на клієнті:
+	Завантажуються «сирі» показники сенсорів з REST API і підписка на WebSocket для нових значень.
+	Для кожного сенсора будується масив точок { timestamp, raw }, а потім ці дані конвертуються функцією
+ 
+	Обчислюються ключові метрики:
+ 
+ 
+	Для кожної кімнати збирається злитий список часових міток і будується набір точок виду{timestamp, sensor_<id>:formatValue(raw)}, який передається в Recharts для рендеру лінійних графіків.
+Індекс флуктуацій (FDI) показує відносну нестабільність даних у кімнаті: чим вище σ відносно середнього x ̅, тим більші коливання показників у часі. У момент, коли FDI>0.6\mathrm{FDI} > 0.6FDI>0.6, картка відповідної кімнати підсвічується червоним (клас card-danger) і з’являється піктограма «possible danger». Так система в реальному часі інформує користувача про потенційні аномалії або небезпечні стани безпеки, базуючись на статистичному аналізі даних без додаткового звернення до бекенду.
+ 
+4 ВИСНОВКИ
+Забезпечено повноцінну реалізацію клієнтської частини на основі Vite + React із коректною організацією стану через React Context та зручними хуками для роботи з REST API і WebSocket. Інтернаціоналізація і динамічна зміна одиниць вимірювання підвищують гнучкість інтерфейсу для кінцевого користувача. Реалізовано рольову модель із трьома рівнями доступу (Guard, Admin, AdminDB), що гарантує безпеку операцій і розмежування прав. В адмін-панелі додано можливості CRUD-операцій над сенсорами та користувачами, а також управління міграціями та бекапами, що спрощує супровід і масштабування системи. Загалом, обрана архітектура забезпечує модульність, простоту підтримки й подальшого розширення функціоналу. 
+ДОДАТОК А
+Посилання на відеозапис доповіді та текст хронологічного опису доповіді
+Відеозапис доповіді на YouTube: https://youtu.be/uEhRQDwtKKA
+Хронологічний опис доповіді:
+00:00 - Вступна частина.
+00:18 - Тестування реєстрації/входу.
+00:52 - Вивід всіх данних з сенсорів.
+01:52 -  Демонстрація бізнес-логіки.
+02:53 - Перагляд графіку окремого сенсору.
+03:19 - Демонстрація інтернаціоналізації.
+03:58 - Демонстрація зміни одиниці виміру.
+04:18 - Демонстрація адміністрування бд.
+06:18 - Створення/застосування міграцій.
+06:43- Створення бекапу бд.
+07:00 - Відновлення бд за допомогою бекапу. 
+ДОДАТОК Б
+  
+Рисунок Б.1 – UML діаграма прецедентів
+
+ 
+Рисунок Б.2 – Діаграма компонентів
+ 
+Рисунок Б.3 – Діаграма взаємодії
+ 
+Рисунок Б.4 – Діаграма станів 
+ДОДАТОК В
+Програмний код
+В.1 Математична обробка прикладних даних.
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab3/pzpi-22-6-skriahin-oleh-lab3/src/components/Dashboard.jsx#L36
+1    async function fetchAllLogs(sensors) {
+2        const rawLogs = {};
+3        await Promise.all(
+4            sensors.map(async ({ id }) => {
+5                const res = await axios.get(`/api/v1/sensor/sensors/${id}/logs/`);
+6                rawLogs[id] = res.data.map(l => ({
+7                    timestamp: l.timestamp,
+8                    raw: l.value,
+9                }));
+10            })
+11        );
+12        return rawLogs;
+13    }
+14    
+15    function computeMetrics(entries) {
+16        const vals = entries.map(e => Number(e.raw));
+17        const mean = vals.reduce((a, b) => a + b, 0) / vals.length || 0;
+18        const variance = vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length || 0;
+19        const stdDev = Math.sqrt(variance);
+20        return { mean, stdDev, fdi: mean ? stdDev / mean : 0 };
+21    }
+22    
+23    function handleNewLog(prevLogs, newLog, computeMetricsFn) {
+24        const { sensor_id, raw, timestamp, location } = newLog;
+25        const arr = prevLogs[sensor_id] || [];
+26        const updated = [...arr, { timestamp, raw }];
+27        const { fdi } = computeMetricsFn(updated);
+28        return {
+29            logsBySensor: { ...prevLogs, [sensor_id]: updated },
+30            fdiByRoom: { [location]: fdi },
+31        };
+32    }
+33    
+34    function buildChartData(logsBySensor, sensors, unitConverter) {
+35        const rooms = {};
+36    
+37        sensors.forEach(({ id, location, sensor_type }) => {
+38            (rooms[location] = rooms[location] || { timestamps: new Set(), sensors: [] })
+39                .sensors.push({ id, type: sensor_type.type });
+40            (logsBySensor[id] || []).forEach(l => rooms[location].timestamps.add(l.timestamp));
+41        });
+42    
+43        const chartData = {};
+44        for (const [room, { timestamps, sensors: roomSensors }] of Object.entries(rooms)) {
+45            chartData[room] = Array.from(timestamps)
+46                .sort()
+47                .map(ts => {
+48                    const point = { timestamp: ts };
+49                    roomSensors.forEach(({ id, type }) => {
+50                        const entry = (logsBySensor[id] || []).find(l => l.timestamp === ts);
+51                        point[`s${id}`] = entry
+52                            ? unitConverter(entry.raw, type)
+53                            : null;
+54                    });
+55                    return point;
+56                });
+57        }
+58        return chartData;
+59    }
+ 
+В.2 Адміністрування бази даних (CRUD операції над таблицею Sensor).
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab3/pzpi-22-6-skriahin-oleh-lab3/src/components/SensorTable.jsx#L5
+1    const [sensors, setSensors] = useState([]);
+2    const [sensorTypes, setSensorTypes] = useState([]);
+3    const [editingId, setEditingId] = useState(null);
+4    const [form, setForm] = useState({ location: '', status: true, sensor_type: '' });
+5    const [newForm, setNewForm] = useState({ location: '', status: true, sensor_type: '' });
+6    
+7    useEffect(() => {
+8        async function loadSensors() {
+9            try {
+10                const r = await axios.get('/api/v1/sensor/sensors/');
+11                setSensors(Array.isArray(r.data) ? r.data : []);
+12            } catch (err) {
+13                console.error(err);
+14                setSensors([]);
+15            }
+16        }
+17        loadSensors();
+18    }, []);
+19    
+20    useEffect(() => {
+21        async function loadTypes() {
+22            try {
+23                const r = await axios.get('/api/v1/sensor/sensor-types/');
+24                setSensorTypes(Array.isArray(r.data) ? r.data : []);
+25            } catch (err) {
+26                console.error('Failed to load sensor types:', err);
+27                setSensorTypes([]);
+28            }
+29        }
+30        loadTypes();
+31    }, []);
+32    
+33    const startEdit = s => {
+34        setEditingId(s.id);
+35        setForm({
+36            location: s.location,
+37            status: s.status,
+38            sensor_type: s.sensor_type.id,
+39        });
+40    };
+41    
+42    const save = async id => {
+43        try {
+44            await axios.put(`/api/v1/sensor/sensors/${id}/`, form);
+45            setEditingId(null);
+46            const r = await axios.get('/api/v1/sensor/sensors/');
+47            setSensors(Array.isArray(r.data) ? r.data : []);
+48        } catch (err) {
+49            console.error(err);
+50        }
+51    };
+52    
+53    const deleteOne = async id => {
+54        try {
+55            await axios.delete(`/api/v1/sensor/sensors/${id}/`);
+56            setSensors(prev => prev.filter(x => x.id !== id));
+57        } catch (err) {
+58            console.error(err);
+59        }
+60    };    
+61    const createSensor = async () => {
+62        try {
+63            if (!newForm.sensor_type) {
+64                alert('Select a sensor type first');
+65                return;
+66            }
+67            await axios.post('/api/v1/sensor/sensors/', {
+68                location: newForm.location,
+69                status: newForm.status,
+70                sensor_type_id: newForm.sensor_type,
+71            });
+72            setNewForm({ location: '', status: true, sensor_type: '' });
+73            const r = await axios.get('/api/v1/sensor/sensors/');
+74            setSensors(Array.isArray(r.data) ? r.data : []);
+75        } catch (err) {
+76            console.error('Failed to create sensor:', err);
+77        }
+78    };
+В.3 Адміністрування бази даних (міграції, бекап та відновлення БД).
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab3/pzpi-22-6-skriahin-oleh-lab3/src/components/AdminPanel.jsx#L11
+1    const { t } = useTranslation();
+2    const [tab, setTab] = useState('incidents');
+3    const [loading, setLoading] = useState(false);
+4    
+5    const handleAdminAction = async (action) => {
+6        let url;
+7        switch (action) {
+8            case 'makemigrations':
+9                url = '/api/v1/admin/make-migrations/';
+10                break;
+11            case 'migrate':
+12                url = '/api/v1/admin/migrate/';
+13                break;
+14            case 'backup':
+15                url = '/api/v1/admin/backup/';
+16                break;
+17            case 'restore':
+18                url = '/api/v1/admin/restore/';
+19                break;
+20            default:
+21                return;
+22        }
+23        setLoading(true);
+24        try {
+25            const r = await axios.post(url);
+26            alert(r.data.message || t('Action completed successfully'));
+27        } catch (err) {
+28            console.error(err);
+29            const msg = err.response?.data?.error || t('An error occurred');
+30            alert(msg);
+31        } finally {
+32            setLoading(false);
+33        }
+34    };
 

@@ -1,1 +1,169 @@
+МІНІСТЕРСТВО ОСВІТИ ТА НАУКИ УКРАЇНИ
+ХАРКІВСЬКИЙ НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ РАДІОЕЛЕКТРОНІКИ
+
+
+
+Кафедра програмної інженерії
+
+
+ЗВІТ
+З дисципліни «Архітектура програмного забезпечення»
+З лабораторної роботи №4
+На тему: «Мобільний клієнт програмної системи»
+
+
+Виконав:								        Перевірив:
+ст. гр. ПЗПІ-22-6 							доц. Сокорчук І.П.
+Скрягін О.С.
+
+
+
+
+Харків 2025 
+1 ІСТОРІЯ ЗМІН
+Таблиця 1.1 – Історія змін 
+№	Дата	Версія звіту	Опис змін та виправлень 
+1	29.05.2025	0.1	Створено розділ “Історія змін”
+2	28.05.2025	0.1	Створено розділ “Завдання”
+3	29.05.2025	0.1	Створено розділ “Опис виконаної роботи”
+4	29.05.2025	0.1	Створено розділ “Висновки”
+5	29.05.2025	0.1	Додано посилання на відеозапис доповіді та текст хронологічного опису у Додаток А
+6	28.05.2025	0.1	Додано діаграми у Додаток Б
+7	29.05.2025	0.1	Додано код у Додаток В
+
+ 
+2 ЗАВДАННЯ
+1.	Необхідно розробити мобільний програмний застосунок для будь-якої поширеної на сьогодні мобільної платформи.
+2.	Проаналізуйте завдання.
+3.	Виконайте контрольні завдання.
+4.	Відкрийте створений на попередній лабораторній роботі репозиторій GitHub.
+5.	Створіть у репозиторії директорію Task4 та текстовий файл з описом інженерних рішень у цій частині проекту, як вказано у додатку З
+6.	Зафіксуйте кожну внесену зміну командою git commit з відповідним коментарем та фіксуйте цією командою усі наступні зміни у проекті.
+7.	Створіть у директорії Task4 піддиректорію для програмного коду.
+8.	Створіть програмний код, завантажте його у створену піддиректорію, зафіксуйте внесені у репозиторій зміни.
+9.	Виконайте функціональне тестування створеного програмного коду та створіть відеозапис цього тестування тривалістю 7..10 хвилин з усними поясненнями процесу тестування.
+10.	Завантажте створений відеозапис тестування YouTube канал для вашого облікового запису в домені @nure.ua.
+11.	Створіть для завантаженого запису його хронологічний опис.
+12.	Оформіть звіт у форматі pdf та завантажте його на навчальну платформу https://dl.nure.ua/.
+13.	У коментарях до завантаженого звіту вкажіть посилання на відеозапис тестування у вашому каналі YouTube. 
+3 ОПИС ВИКОНАНОЇ РОБОТИ
+Клієнтська частина мобільного застосунку реалізована на сучасному стеку Android + Kotlin, із застосуванням архітектури MVVM (ViewModel + LiveData) та бібліотек Retrofit для HTTP-запитів і Coroutines для асинхронності. Авторизація виконана через JWT (Simple JWT на бекенді), токени зберігаються у SharedPreferences і автоматично додаються до заголовка Authorization у всіх запитах. Інтерфейс оформлений у стилі Material 3, а навігація між екранами здійснюється за допомогою звичайних Android Activities.
+Бекенд-частина побудована на Django REST Framework із налаштованою перевіркою прав доступу (permissions) та CRUD-ендпоінтами для Users, Sensors, SensorLogs та IncidentReport. Для реєстрації пристроїв і пуш-сповіщень використано Firebase Cloud Messaging (FCM): клієнт отримує унікальний FCM-токен і передає його на сервер, де він зберігається в моделі Device.
+У центрі бізнес-логіки мобільного клієнта лежить обчислення Індексу пожежної небезпеки (FDI) для кожної локації на основі даних трьох ключових датчиків: температури, газу та вологості. Спочатку застосунок групує всі сенсори за їхнім полем location і для кожного витягує останні за часом вимірювання. Потім кожне значення нормалізується у фіксованих діапазонах: температури з 20° до 100°C за формулою: Tn=(t−20)/(100−20), рівня газу від 0 до 300 за формулою Gn=g/300, вологості від 0 до 100% за формулою Hn=h/100. Потім FDI обчислюється як зважена сума компонентів:
+FDI=0,4Tn+0,3Gn+0,3 (1−Hn) і округлюється до двох знаків. Якщо якогось датчика немає — на картці з’являється «Insufficient sensors». Для наочності фон картки змінюється: зелений для FDI<0.4, жовтий для значень між 0.4 і 0.6, червоний коли FDI>0.6. Якщо користувач виявляє проблему, він натискає «Report», вибирає тип інциденту та вводить опис, після чого створюється запис IncidentReport із полями type, details, location та FDI. Після цього на бекенді сигнал post_save моделі миттєво тригерить розсилку push-сповіщень: кожен зареєстрований FCM-токен отримує Notification із заголовком «Новий інцидент» і текстом «Локація: …, FDI: …», а у розділі «Оповіщення» новий інцидент з’являється зверху з повними деталями та часовою міткою.  
+4 ВИСНОВКИ
+У ході виконання лабораторної роботи було реалізовано повноцінний мобільний клієнт для моніторингу пожежної безпеки торгових центрів із використанням платформи Android та мови Kotlin. 
+ДОДАТОК А
+Посилання на відеозапис доповіді та текст хронологічного опису доповіді
+Відеозапис доповіді на YouTube: https://youtu.be/GCWu_12fQjk
+Хронологічний опис доповіді:
+00:00 - Вступна частина.
+00:16 - Реєстрація та авторизація.
+00:58 - Робота з JWT та FCM-токенами.
+01:38 - Демонстрація бізнес-логіки.
+03:40 - Перагляд сповіщень.
+04:10 - Демонстрація створення звітів.
+04:46 - Демонстрація роботи PUSH-повідомлень. 
+ДОДАТОК Б
+ 
+Рисунок Б.1 – UML діаграма прецедентів
+ 
+Рисунок Б.2 – Діаграма компонентів
+ 
+Рисунок Б.3 – Діаграма взаємодії
+ 
+Рисунок Б.4 – Діаграма станів 
+ДОДАТОК В
+Програмний код
+В.1 Математична обробка прикладних даних.
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab4/pzpi-22-6-skriahin-oleh-lab4/app/src/main/java/com/example/smartshield/data/repository/SensorRepository.kt#L12
+1    class SensorRepository(private val tm: TokenManager) {
+2        @SuppressLint("DefaultLocale")
+3        suspend fun getRoomsFdi(): Result<List<RoomFdi>> = coroutineScope {
+4            val token = tm.accessToken ?: return@coroutineScope Result.failure(Exception("No token"))
+5            val bearer = "Bearer $token"
+6    
+7            val sensorsResp = RetrofitClient.sensorApi.getSensors(bearer)
+8            if (!sensorsResp.isSuccessful) {
+9                return@coroutineScope Result.failure(Exception("Sensors fetch failed: ${sensorsResp.code()}"))
+10            }
+11            val sensors: List<Sensor> = sensorsResp.body() ?: emptyList()
+12    
+13            val byLocation: Map<String, List<Sensor>> = sensors.groupBy { it.location }
+14    
+15            val rooms = byLocation.map { (location, sensorList) ->
+16                async {
+17                    val latestByType = mutableMapOf<String, SensorLog>()
+18                    sensorList.forEach { s ->
+19                        val logsResp = RetrofitClient.sensorApi.getLogsForSensor(bearer, s.id)
+20                        if (logsResp.isSuccessful) {
+21                            logsResp.body()?.maxByOrNull { it.timestamp }
+22                                ?.let { log -> latestByType[s.sensor_type.type] = log }
+23                        }
+24                    }
+25    
+26                    val required = listOf("temperature", "humidity", "gas")
+27                    return@async if (required.all { latestByType.containsKey(it) }) {
+28                        fun normalize(v: Float, mn: Float, mx: Float): Float = (v - mn) / (mx - mn)
+29                        val Tn = normalize(latestByType["temperature"]!!.value, 20f, 100f)
+30                        val Gn = normalize(latestByType["gas"]!!.value, 0f, 300f)
+31                        val Hn = normalize(latestByType["humidity"]!!.value, 0f, 100f)
+32                        val fdi = 0.4f * Tn + 0.3f * Gn + 0.3f * (1 - Hn)
+33                        RoomFdi(location, String.format("%.2f", fdi).toFloat(), "ok")
+34                    } else {
+35                        RoomFdi(location, null, "insufficient_sensors")
+36                    }
+37                }
+38            }.map { it.await() }
+39    
+40            Result.success(rooms)
+41        }
+42    } 
+В.2 Реєстрація FCM-токена.
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab4/pzpi-22-6-skriahin-oleh-lab4/app/src/main/java/com/example/smartshield/ui/auth/LoginActivity.kt#L28
+1    FirebaseMessaging.getInstance().token
+2        .addOnCompleteListener { task ->
+3            if (task.isSuccessful) {
+4                val fcmToken = task.result!!
+5                lifecycleScope.launch {
+6                    val repo = DeviceRepository(TokenManager(this@LoginActivity))
+7                    repo.registerToken(fcmToken)
+8                        .onSuccess {}
+9                        .onFailure { Log.w("DeviceReg", it.message ?: "") }
+10                }
+11            } else {
+12                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+13            }
+14        }
+ 
+
+В.3 Перехоплення та показ повідомлень.
+GitHub репозиторій: https://github.com/NureSkriahinOleh/apz-pzpi-22-6-skriahin-oleh/blob/main/Lab4/pzpi-22-6-skriahin-oleh-lab4/app/src/main/java/com/example/smartshield/MyFirebaseService.kt#L11
+1    class MyFirebaseService : FirebaseMessagingService() {
+2    
+3        override fun onNewToken(token: String) {
+4            super.onNewToken(token)
+5        }
+6    
+7        override fun onMessageReceived(remoteMessage: RemoteMessage) {
+8            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+9                val channel = NotificationChannel(
+10                    "incidents", "Incident Alerts", NotificationManager.IMPORTANCE_HIGH
+11                )
+12                getSystemService(NotificationManager::class.java)
+13                    .createNotificationChannel(channel)
+14            }
+15    
+16            remoteMessage.notification?.let {
+17                val notif = NotificationCompat.Builder(this, "incidents")
+18                    .setContentTitle(it.title ?: "Alert")
+19                    .setContentText(it.body ?: "")
+20                    .setSmallIcon(R.drawable.ic_notification)
+21                    .setAutoCancel(true)
+22                    .build()
+23                NotificationManagerCompat.from(this)
+24                    .notify( (System.currentTimeMillis() % 10000).toInt(), notif)
+25            }
+26        }
+27    }
 

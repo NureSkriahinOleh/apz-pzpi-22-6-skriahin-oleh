@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">SmartShield</string>
+    <string name="report_incident">Report Incident</string>
+    <string name="location">Location:</string>
+    <string name="fdi">FDI:</string>
+    <string name="type">Type:</string>
+    <string name="details">Details:</string>
+    <string name="send">Send</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="go_to_register">Go to Register</string>
+    <string name="Incidents">Сповіщення</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="repeat_password">Repeat Password</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="go_to_login">Go to Login</string>
+    <string name="report">Report</string>
+</resources>

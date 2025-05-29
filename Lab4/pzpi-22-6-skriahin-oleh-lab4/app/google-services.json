@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "709459156762",
+    "project_id": "smartshield-6d323",
+    "storage_bucket": "smartshield-6d323.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709459156762:android:b772630c206d56b46b16a3",
+        "android_client_info": {
+          "package_name": "com.example.smartshield"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8P-B2smdFa6nGqCeC_HrRouPEpEczRyA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

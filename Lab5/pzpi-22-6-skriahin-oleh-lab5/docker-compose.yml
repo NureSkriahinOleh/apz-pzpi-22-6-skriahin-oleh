@@ -1,0 +1,51 @@
+
+services:
+  db:
+    image: postgres:15
+    container_name: apz_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: SmartShield
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./Back/SmartShield
+    container_name: apz_backend
+    volumes:
+      - ./Back/SmartShield:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DB_HOST: db
+      DJANGO_DB_NAME: SmartShield
+      DJANGO_DB_USER: postgres
+      DJANGO_DB_PASSWORD: root
+      DJANGO_DB_PORT: 5432
+      DEBUG: '1'
+      SECRET_KEY: 'your_secret_key_here'
+      ALLOWED_HOSTS: '*'
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./Front/iot-dashboard
+    container_name: apz_frontend
+    volumes:
+      - ./Front/iot-dashboard:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
